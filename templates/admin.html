@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin — SPK Konsentrasi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="admin-header">
+            <div>
+                <h1>Dashboard Admin</h1>
+                <p>Selamat datang, <strong>{{ admin_nama }}</strong></p>
+            </div>
+            <div>
+                <a href="/admin/export" class="btn-success">📥 Export Excel</a>
+                <a href="/logout" class="btn-secondary">Logout</a>
+            </div>
+        </header>
+
+        <section class="statistik">
+            <div class="stat-card">
+                <h3>{{ data|length }}</h3>
+                <p>Total Assessment</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ data|selectattr("konsentrasi_utama", "equalto", "Artificial Intelligence")|list|length }}</h3>
+                <p>Rekomendasi AI</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ data|selectattr("konsentrasi_utama", "equalto", "Software Development")|list|length }}</h3>
+                <p>Rekomendasi Software Dev</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ data|selectattr("konsentrasi_utama", "equalto", "Computer Network")|list|length }}</h3>
+                <p>Rekomendasi Network</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Data Hasil Assessment</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Tanggal</th>
+                            <th>Konsentrasi Utama</th>
+                            <th>AI</th>
+                            <th>Software Dev</th>
+                            <th>Network</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in data %}
+                        <tr>
+                            <td>{{ d.id }}</td>
+                            <td>{{ d.nama }}</td>
+                            <td>{{ d.created_at }}</td>
+                            <td><strong>{{ d.konsentrasi_utama }}</strong></td>
+                            <td>{{ d.nilai_ai }}%</td>
+                            <td>{{ d.nilai_sd }}%</td>
+                            <td>{{ d.nilai_cn }}%</td>
+                            <td>
+                                <button onclick="lihatDetail({{ d.id }})" class="btn-small">Detail</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal Detail -->
+    <div id="modal-detail" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="tutupModal()">&times;</span>
+            <h2>Detail Assessment</h2>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const dataAssessment = {{ data | tojson | safe }};
+
+        function lihatDetail(id) {
+            // Konversi ke number untuk perbandingan yang aman
+            const d = dataAssessment.find(x => Number(x.id) === Number(id));
+            if (!d) {
+                alert("Data tidak ditemukan");
+                return;
+            }
+
+            let html = `<p><strong>Nama:</strong> ${d.nama}</p>`;
+            html += `<p><strong>Tanggal:</strong> ${d.created_at}</p>`;
+            html += `<p><strong>Konsentrasi Utama:</strong> ${d.konsentrasi_utama}</p>`;
+            html += `<h3>Peringkat:</h3><ul>`;
+            (d.peringkat || []).forEach(p => {
+                html += `<li>${p.peringkat}. ${p.nama} — ${p.nilai}%</li>`;
+            });
+            html += `</ul>`;
+            html += `<h3>Jawaban Kuesioner:</h3><ol>`;
+            (d.jawaban || []).forEach((j, i) => {
+                html += `<li>Pertanyaan ${i+1}: <strong>${j}</strong></li>`;
+            });
+            html += `</ol>`;
+
+            document.getElementById("detail-content").innerHTML = html;
+            document.getElementById("modal-detail").style.display = "block";
+        }
+
+        function tutupModal() {
+            document.getElementById("modal-detail").style.display = "none";
+        }
+    </script>
+</body>
+</html>

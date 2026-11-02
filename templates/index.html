@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPK Pemilihan Konsentrasi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistem Pendukung Keputusan</h1>
+            <h2>Pemilihan Konsentrasi Keahlian Mahasiswa</h2>
+            <p>Metode AHP-TOPSIS | Universitas Nusa Putra</p>
+        </header>
+
+        <section class="intro">
+            <h3>Selamat Datang</h3>
+            <p>
+                Sistem ini membantu Anda menentukan konsentrasi keahlian yang paling
+                sesuai dengan minat, kemampuan, dan orientasi karier Anda.
+            </p>
+        </section>
+
+        <section class="konsentrasi">
+            <h3>Konsentrasi yang Tersedia</h3>
+            <div class="cards">
+                {% for alt in alternatif %}
+                <div class="card">
+                    <h4>{{ alt.nama }}</h4>
+                    <p>Kode: {{ alt.kode }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="kriteria">
+            <h3>Kriteria Penilaian</h3>
+            <ul>
+                {% for k in kriteria %}
+                <li><strong>{{ k.kode }}</strong> — {{ k.nama }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <div class="cta">
+            <a href="/kuisioner" class="btn-primary">Mulai Kuesioner</a>
+            <a href="/login" class="btn-secondary">Login Admin</a>
+        </div>
+    </div>
+</body>
+</html>

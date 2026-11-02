@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Rekomendasi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Hasil Rekomendasi</h1>
+            <p>Berdasarkan jawaban kuesioner Anda</p>
+        </header>
+
+        <section class="hasil-utama">
+            <h2>Konsentrasi yang Direkomendasikan</h2>
+            <div id="konsentrasi-utama" class="highlight"></div>
+        </section>
+
+        <section class="chart-section">
+            <h3>Persentase Kecocokan</h3>
+            <canvas id="chart-kecocokan"></canvas>
+        </section>
+
+        <section class="peringkat">
+            <h3>Peringkat Lengkap</h3>
+            <table id="tabel-peringkat">
+                <thead>
+                    <tr>
+                        <th>Peringkat</th>
+                        <th>Konsentrasi</th>
+                        <th>Kecocokan</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+        <section class="karier">
+            <h3>Saran Karier</h3>
+            <ul id="saran-karier"></ul>
+        </section>
+
+        <section class="detail-ahp">
+            <h3>Bobot Kriteria (Hasil AHP)</h3>
+            <table id="tabel-bobot">
+                <thead>
+                    <tr><th>Kode</th><th>Kriteria</th><th>Bobot</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <p id="info-cr"></p>
+        </section>
+
+        <div class="cta">
+            <a href="/kuisioner" class="btn-primary">Isi Ulang Kuesioner</a>
+            <a href="/" class="btn-secondary">Kembali ke Beranda</a>
+        </div>
+    </div>
+
+    <script>
+        // Ambil hasil dari sessionStorage
+        const hasil = JSON.parse(sessionStorage.getItem("hasil"));
+        if (!hasil) {
+            window.location.href = "/kuisioner";
+        }
+
+        // Tampilkan konsentrasi utama
+        document.getElementById("konsentrasi-utama").innerHTML =
+            `<strong>${hasil.konsentrasi_utama}</strong>`;
+
+        // Bar chart
+        const ctx = document.getElementById("chart-kecocokan").getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: hasil.peringkat.map(p => p.nama),
+                datasets: [{
+                    label: "Kecocokan (%)",
+                    data: hasil.peringkat.map(p => p.nilai),
+                    backgroundColor: ["#4CAF50", "#2196F3", "#FF9800"]
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true, max: 100 } }
+            }
+        });
+
+        // Tabel peringkat
+        const tbody = document.querySelector("#tabel-peringkat tbody");
+        hasil.peringkat.forEach(p => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${p.peringkat}</td>
+                    <td>${p.nama}</td>
+                    <td>${p.nilai}%</td>
+                </tr>`;
+        });
+
+        // Saran karier
+        const ulKarier = document.getElementById("saran-karier");
+        hasil.saran_karier.forEach(k => {
+            ulKarier.innerHTML += `<li>${k}</li>`;
+        });
+
+        // Tabel bobot AHP
+        const tbodyBobot = document.querySelector("#tabel-bobot tbody");
+        hasil.bobot_kriteria.forEach(b => {
+            tbodyBobot.innerHTML += `
+                <tr>
+                    <td>${b.kode}</td>
+                    <td>${b.nama}</td>
+                    <td>${b.bobot}</td>
+                </tr>`;
+        });
+        document.getElementById("info-cr").textContent =
+            `Consistency Ratio (CR) = ${hasil.CR} (${hasil.CR <= 0.1 ? "Konsisten" : "Tidak Konsisten"})`;
+    </script>
+</body>
+</html>

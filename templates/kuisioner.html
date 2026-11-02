@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuesioner — SPK Konsentrasi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kuesioner Penilaian Diri</h1>
+            <p>Isi 15 pertanyaan berikut sesuai dengan kondisi Anda</p>
+        </header>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <p id="progress-text">0 / 15 terjawab</p>
+
+        <form id="form-kuesioner">
+            <div class="form-group">
+                <label>Nama (opsional)</label>
+                <input type="text" id="nama" placeholder="Masukkan nama Anda">
+            </div>
+
+            <div id="pertanyaan-container"></div>
+
+            <button type="submit" class="btn-primary" id="btn-submit" disabled>
+                Lihat Hasil Rekomendasi
+            </button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
